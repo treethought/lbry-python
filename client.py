@@ -4,6 +4,7 @@ from pprint import pprint
 
 BASE_URL = 'http://localhost:5279/lbryapi'
 
+
 def _request(method, **kwargs):
     params = {}
     for k, v in kwargs.items():
@@ -18,6 +19,7 @@ def _request(method, **kwargs):
         raise Exception(code, msg)
     return result['result']
 
+
 def channel_list_mine():
     """Get my channels
 
@@ -26,6 +28,7 @@ def channel_list_mine():
     """
     res = _request('channel_list_mine')
     return res
+
 
 def channel_new(name, amount):
     """Generate a publisher key and create a new certificate claim
@@ -52,6 +55,7 @@ def channel_new(name, amount):
     res = _request('channel_new', channel_name=name, amount=amount)
     return res['result']['claim_id']
 
+
 def claim_abandon(claim_id):
     """Abandon a name and reclaim credits from the claim
 
@@ -68,12 +72,13 @@ def claim_abandon(claim_id):
     print(res)
     return res
 
+
 def claim_list(name):
     """Get Claims for a name
-    
+
     Arguments:
         name {str} -- search for claims on this name
-    
+
     Returns:
         (dict) State of claims assigned for the name
     {
@@ -98,6 +103,7 @@ def claim_list(name):
     res = _request('claim_list', name=name)
     return res
 
+
 def claim_list_mine():
     """List my name claims
     Returns
@@ -121,8 +127,9 @@ def claim_list_mine():
         },
    ]
    """
-   res = _request('claim_list_mine')
-   return res
+    res = _request('claim_list_mine')
+    return res
+
 
 def claim_new_support(name, claim_id, amount):
     """Support a claim name
@@ -144,6 +151,7 @@ def claim_new_support(name, claim_id, amount):
         amount = float(amount)
     res = _request('claim_new_support', name, claim_id, amount)
     return res
+
 
 def claim_show(name, txid=None, nout=None, claim_id=None):
     """ Resolve claim info from a LBRY name
@@ -168,6 +176,7 @@ def claim_show(name, txid=None, nout=None, claim_id=None):
         }
     """
 
+
 def descriptor_get(sd_hash, timeout=None, payment_rate_manager=None):
     """Download and return a sd blob
 
@@ -183,6 +192,7 @@ def descriptor_get(sd_hash, timeout=None, payment_rate_manager=None):
     """
     res = _request('descriptor_get', sd_hash, timeout, payment_rate_manager)
     return res
+
 
 def file_delete(name=None, sd_hash=None, file_hash=None, stream_hash=None, claim_id=None, outpoint=None, rowid=None, delete_target_file=None):
     """Delete a lbry file
@@ -201,8 +211,10 @@ def file_delete(name=None, sd_hash=None, file_hash=None, stream_hash=None, claim
     Returns:
         (bool) true if deletion was successful
     """
-    res = _request('file_delete', name, sd_hash, file_hash, stream_hash, claim_id, outpoint, rowid, delete_target_file)
+    res = _request('file_delete', name, sd_hash, file_hash,
+                   stream_hash, claim_id, outpoint, rowid, delete_target_file)
     return res
+
 
 def file_list(**kwargs):
     """List files limited by optional filters
@@ -247,6 +259,7 @@ def file_list(**kwargs):
     res = _request('file_list', **kwargs)
     return res
 
+
 def file_set_status(status, name=None, sd_hash=None, file_name=None):
     """Start or stop downloading a file
 
@@ -258,7 +271,6 @@ def file_set_status(status, name=None, sd_hash=None, file_name=None):
     Returns:
         (str) Confirmation message
     """
-
 
 
 def get(uri, file_name=None, timeout=None, download_directory=None):
@@ -293,6 +305,9 @@ def get(uri, file_name=None, timeout=None, download_directory=None):
             'metadata': (dict) Metadata dictionary
         }
     """
+    res = _request('get', uri=uri, file_name=file_name, timeout=timeout)
+    return res
+
 
 def get_availability(uri, sd_timeout=None, peer_timeout=None):
     """Get stream availability for lbry uri
@@ -305,6 +320,8 @@ def get_availability(uri, sd_timeout=None, peer_timeout=None):
     Returns:
         (float) Peers per blob / total blobs
     """
+    return _request('get_availability', uri=uri, sd_timeout=sd_timeout, peer_timeout=peer_timeout)
+
 
 def peer_list(blob_hash, timeout=None):
     """Get peers for blob hash
@@ -318,7 +335,8 @@ def peer_list(blob_hash, timeout=None):
     res = _request('peer_list', blob_hash=blob_hash, timeout=timeout)
     return res
 
-def publish(name, bid, metadata=None, **kwargs):
+
+def publish(name, bid, file_path=None, metadata=None, **kwargs):
     """Make a new name claim and publish associated data to lbrynet.
 
     Updates over existing claim if user already has a claim for name.
@@ -375,11 +393,12 @@ def publish(name, bid, metadata=None, **kwargs):
     fields = ['title', 'description', 'author', 'language', 'license', 'nsfw']
     for f in fields:
         if kwargs.get(f) is None and metadata.get(f) is None:
-            msg = '{} is a required field for publishing. Please include it as a keyword arg or within metadata'
+            msg = '{} is a required field for publishing. Please include it as a keyword arg or within metadata'.format(f)
             raise Exception(msg)
 
-    res = _request('publish', name, bid, metadata, **kwargs)
+    res = _request('publish', name=name, bid=bid, file_path=file_path, metadata=metadata, **kwargs)
     return res
+
 
 def reflect(sd_hash):
     """Reflect a stream
@@ -390,7 +409,6 @@ def reflect(sd_hash):
         (bool) true if successful
     """
     res = _request('reflect', sd_hash=sd_hash)
-
 
 
 def resolve(uri):
@@ -468,6 +486,7 @@ def resolve(uri):
     res = _request('resolve', uri=uri)
     return res
 
+
 def resolve_name(name):
     """Resolve stream info from a LBRY name
 
@@ -479,6 +498,7 @@ def resolve_name(name):
     """
     res = _request('resolve_name', name=name)
     return res
+
 
 def send_amount_to_address(amount, address):
     """Send credits to an address
@@ -492,6 +512,7 @@ def send_amount_to_address(amount, address):
     res = _request('send_amount_to_address', amount=amount, address=address)
     return res
 
+
 def settings_get():
     """Get daemon settings
 
@@ -501,6 +522,7 @@ def settings_get():
     """
     res = _request('settings_get')
     return res
+
 
 def settings_set(**kwargs):
     """Set daemon settings
@@ -522,6 +544,7 @@ def settings_set(**kwargs):
     """
     res = _request('settings_set', **kwargs)
     return res
+
 
 def status(session_status=False):
     """Return daemon status
@@ -547,8 +570,9 @@ def stream_cost_estimate(name, size=None):
         (float) Estimated cost in lbry credits, returns None if uri is not
             resolveable
     """
-    res = _request('stream_cost_estimate', name=name, size=size)
+    res = _request('stream_cost_estimate', uri=name, size=size)
     return res
+
 
 def transaction_list():
     """List transactions belonging to wallet
@@ -561,6 +585,7 @@ def transaction_list():
     res = _request('transaction_list')
     return res
 
+
 def transaction_show(txid):
     """Get a decoded transaction from a txid
 
@@ -571,6 +596,7 @@ def transaction_show(txid):
     """
     res = _request('transaction_show', txid=txid)
     return res
+
 
 def wallet_balance(address=None, include_uncomfirmed=None):
     """Return the balance of the wallet
@@ -583,8 +609,10 @@ def wallet_balance(address=None, include_uncomfirmed=None):
     Returns:
         (float) amount of lbry credits in wallet
     """
-    res = _request('wallet_balance', address=address, include_uncomfirmed=include_uncomfirmed)
+    res = _request('wallet_balance', address=address,
+                   include_uncomfirmed=include_uncomfirmed)
     return res
+
 
 def wallet_is_address_mine(address):
     """Checks if an address is associated with the current wallet.
@@ -597,6 +625,7 @@ def wallet_is_address_mine(address):
     res = _request('wallet_is_address_mine', address=address)
     return res
 
+
 def wallet_list():
     """List wallet addresses
 
@@ -606,6 +635,7 @@ def wallet_list():
     res = _request('wallet_list')
     return res
 
+
 def wallet_new_address():
     """Generate a new wallet address
 
@@ -614,6 +644,7 @@ def wallet_new_address():
     """
     res = _request('wallet_new_address')
     return res
+
 
 def wallet_public_key(address):
     """Get public key from wallet address
@@ -627,6 +658,9 @@ def wallet_public_key(address):
     res = _request('wallet_public_key', address=address)
     return res
 
+# TODO
+# def wallet_prefill_addresses
+
 def wallet_unused_address():
     """Return an address containing no balance, will create a new address if there is none.
 
@@ -635,4 +669,3 @@ def wallet_unused_address():
     """
     res = _request('wallet_unused_address')
     return res
-
